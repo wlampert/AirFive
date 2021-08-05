@@ -1,0 +1,109 @@
+[
+{
+    "model": "users.customer",
+    "pk": 1,
+    "fields": {
+        "first_name": "Johnson",
+        "last_name": "Bernstein",
+        "email": "johnson@gmail.com",
+        "address": "Florida"
+    }
+},
+{
+    "model": "users.customer",
+    "pk": 2,
+    "fields": {
+        "first_name": "Keerthi",
+        "last_name": "Radharkishnan",
+        "email": "kdog@gmail.com",
+        "address": "New York"
+    }
+},
+{
+    "model": "users.customer",
+    "pk": 3,
+    "fields": {
+        "first_name": "Karen",
+        "last_name": "Kirkland",
+        "email": "kk1950@yahoo.com",
+        "address": "North Carolina"
+    }
+},
+{
+    "model": "users.business",
+    "pk": 1,
+    "fields": {
+        "username": "Awesome_Stylist_55",
+        "email": "awesomestylist@gmail.com",
+        "address": "NYC",
+        "phone_number": 911,
+        "rating": 5
+    }
+},
+{
+    "model": "users.business",
+    "pk": 2,
+    "fields": {
+        "username": "Okay_Stylist",
+        "email": "okay@gmail.com",
+        "address": "Cville",
+        "phone_number": 411,
+        "rating": 3
+    }
+},
+{
+    "model": "users.business",
+    "pk": 3,
+    "fields": {
+        "username": "Another_Okay_Stylist",
+        "email": "mm3a1@virginia.edu",
+        "address": "Fairfax",
+        "phone_number": 703123456,
+        "rating": 3
+    }
+},
+{
+    "model": "services.review",
+    "pk": 1,
+    "fields": {
+        "date": "2020-03-02",
+        "description": "He's awesome",
+        "rating": 5,
+        "business": 1,
+        "created_by": 1
+    }
+},
+{
+    "model": "services.review",
+    "pk": 2,
+    "fields": {
+        "date": "2020-03-02",
+        "description": "He's alright",
+        "rating": 4,
+        "business": 2,
+        "created_by": 2
+    }
+},
+{
+    "model": "services.review",
+    "pk": 3,
+    "fields": {
+        "date": "2020-03-02",
+        "description": "I like these clothes",
+        "rating": 4,
+        "business": 3,
+        "created_by": 2
+    }
+},
+{
+    "model": "services.review",
+    "pk": 4,
+    "fields": {
+        "date": "2020-03-02",
+        "description": "Absolute drip. Love this site and love this stylist.",
+        "rating": 5,
+        "business": 1,
+        "created_by": 3
+    }
+}
+]

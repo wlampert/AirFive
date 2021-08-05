@@ -1,0 +1,115 @@
+/* @font-face {
+  font-family: "GT-America-Regular";
+  font-style: normal;
+  font-weight: 400;
+  src: local("GT-America-Regular"),
+    url(../assets/fonts/GT-America-Regular.otf) format("otf");
+}
+@font-face {
+  font-family: "GT-America-Medium";
+  src: local("GT-America-Medium"),
+    url(../assets/fonts/GT-America-Medium.otf) format("otf");
+}
+
+@font-face {
+  font-family: "GT-America-Expanded-Medium";
+  src: local("GT-America-Expanded-Medium"),
+    url(../assets/fonts/GT-America-Expanded-Medium.otf) format("otf");
+} */
+
+@font-face {
+  font-family: "NeueHaas";
+  src: local("NeueHaasUnicaRegular"),
+    url("../assets/fonts/neue-haas-unica-pro-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+body {
+  font-family: "Inter", sans-serif, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+body {
+  margin: 0;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+hr {
+  color: #000;
+  height: 1px;
+  opacity: 0.3;
+}
+html,
+body,
+#root {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100%;
+}
+
+h1 {
+  font-size: 3em;
+  line-height: 1.33;
+  font-weight: 700 !important;
+  margin: 0 0 0 0;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 700 !important;
+  line-height: 1.1;
+}
+
+h3 {
+  line-height: 1;
+  font-size: 1.5rem;
+  font-weight: 700 !important;
+  margin: 0.5em 0 0 0;
+}
+
+h4 {
+  font-weight: 700 !important;
+  font-size: 1.33rem;
+  line-height: 1.1;
+}
+
+h5 {
+  margin-bottom: 1.45rem;
+  font-weight: 400;
+  line-height: 20px;
+  font-size: 0.95em;
+}
+
+h6 {
+  font-size: 0.9em;
+  font-weight: 400;
+  margin: 0;
+}
+
+small {
+  text-transform: uppercase;
+}
+
+p {
+  line-height: 1.9;
+  font-weight: 300;
+  margin: 0 0 0 0;
+  font-weight: 400;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
