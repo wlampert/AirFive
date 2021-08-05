@@ -1,0 +1,167 @@
+version: "3.5"
+services:
+        db:
+          image: mysql:5.7 
+          container_name: db
+          networks:
+            - backend
+          volumes:
+            - ./travis/set_up_db.sql:/tmp/setup.sql
+          environment:
+            MYSQL_DATABASE: 'db'
+            MYSQL_ALLOW_PASSWORD: "root"
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          command: mysqld --init-file="/tmp/setup.sql"
+        models:
+          image: tp33/django
+          container_name: models
+          networks:
+            - backend
+            - service_mesh
+          depends_on:
+            - "db"
+          volumes:
+            - ./src/backend:/app/marketplace
+          ports:
+            - "8001:8000"
+          restart: on-failure:10
+          command: bash -c "chmod 777 -R /app && pip install -r /app/marketplace/requirements.txt && python /app/marketplace/manage.py migrate && cd marketplace && python /app/marketplace/manage.py flush --noinput && mod_wsgi-express start-server --working-directory /app/marketplace --reload-on-changes /app/marketplace/marketplace/wsgi.py"
+        experience:
+          image: tp33/django
+          volumes:
+            - ./src/experience:/app/experience
+          networks:
+            - public
+            - service_mesh
+          ports:
+            - "8002:8000"
+          command: bash -c "chmod 777 -R /app && pip install -r /app/experience/requirements.txt && python /app/experience/manage.py migrate && cd experience && mod_wsgi-express start-server --working-directory /app/experience --reload-on-changes /app/experience/experience/wsgi.py"
+        front1:
+              build: ./src/frontend
+              container_name: front1
+              volumes:
+                - ./src/frontend/:/app
+                - ./app/node_modules
+              networks:
+                - public
+              ports:
+                - "3000:3000"
+              environment:
+                - NODE_ENV=development
+              command: bash -c "chmod 777 -R /app && npm install && npm start"
+        front2:
+              build: ./src/frontend
+              container_name: front2
+              volumes:
+                - ./src/frontend/:/app
+                - ./app/node_modules
+              networks:
+                - public
+              ports:
+                - "3002:3002"
+              environment:
+                - NODE_ENV=development
+              command: bash -c "chmod 777 -R /app && npm install && npm start"
+        kafka:
+          image: spotify/kafka
+          container_name: kafka
+          networks:
+              - batch_network
+              - service_mesh
+          environment:
+              ADVERTISED_HOST: kafka
+              ADVERTISED_PORT: 9092
+          hostname: kafka
+          
+        es:
+          image: elasticsearch:7.4.0
+          container_name: es
+          environment:
+              - discovery.type=single-node
+          networks:
+              - service_mesh
+          ports:
+              - "9200:9200"
+        batch:
+          image: tp33/django
+          container_name: batch
+          volumes:
+              - ./src/batch/app:/app/
+          networks:
+              - batch_network
+              - service_mesh
+          restart: on-failure
+          command: bash -c "chmod +x /app/ && pip install elasticsearch -U && pip install kafka-python -U && curl -XDELETE es:9200/_all && python kafka_es_script.py"
+        proxy:
+            build: ./src/haproxy/app
+            container_name: proxy
+            depends_on:
+              - front1
+              - front2
+            networks:
+              - public
+            ports:
+                - 9300:9300
+        spark-master:
+          image: gettyimages/spark
+          command: bash -c "pip install requests==2.23.0 && bin/spark-class org.apache.spark.deploy.master.Master -h spark-master"
+          container_name: spark-master
+          hostname: spark-master
+          environment:
+            MASTER: spark://spark-master:7077
+            SPARK_CONF_DIR: /conf
+          expose:
+            - 7001
+            - 7002
+            - 7003
+            - 7004
+            - 7005
+            - 7006
+            - 7077
+            - 6066
+          ports:
+            - 4040:4040
+            - 6066:6066
+            - 7077:7077
+            - 8080:8080
+          networks:
+            - service_mesh
+          volumes:
+            - ./src/batch/app:/app/
+        spark-worker:
+          image: gettyimages/spark
+          command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+          container_name: spark-worker
+          hostname: spark-worker
+          environment:
+            SPARK_CONF_DIR: /conf
+            SPARK_WORKER_CORES: 2
+            SPARK_WORKER_MEMORY: 512m
+            SPARK_WORKER_PORT: 8881
+            SPARK_WORKER_WEBUI_PORT: 8081
+          networks:
+            - service_mesh
+          expose:
+            - 7012
+            - 7013
+            - 7014
+            - 7015
+            - 7016
+            - 8881
+          ports:
+            - 8081:8081
+          volumes:
+            - ./src/batch/app:/app/
+
+
+
+networks:
+  backend:
+    name: backend
+    external: true
+  service_mesh:
+    name: service_mesh
+  public:
+    name: public
+  batch_network:
+    name: batch_network

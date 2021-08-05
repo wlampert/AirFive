@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+        db:
+          image: mysql:5.7 
+          container_name: db
+          networks:
+            - backend
+          volumes:
+            - ./travis/set_up_db.sql:/tmp/setup.sql
+          environment:
+            MYSQL_DATABASE: 'db'
+            MYSQL_ALLOW_PASSWORD: "root"
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          command: mysqld --init-file="/tmp/setup.sql"
+        models:
+            image: tp33/django
+            container_name: models
+            networks:
+              - backend
+            depends_on:
+              - "db"
+            volumes:
+              - ./src/backend:/app/marketplace
+            ports:
+              - "8001:8000"
+            restart: on-failure:10
+            command: bash -c "chmod 777 -R /app && pip install -r /app/marketplace/requirements.txt && python /app/marketplace/manage.py migrate && cd marketplace && python /app/marketplace/manage.py flush --noinput && mod_wsgi-express start-server --working-directory /app/marketplace --reload-on-changes /app/marketplace/marketplace/wsgi.py"
+
+networks:
+  backend:
+    name: backend
+    external: true

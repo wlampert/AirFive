@@ -1,0 +1,69 @@
+version: "3.5"
+services:
+  models:
+    image: tp33/django
+    external_links:
+      - mysql:db
+    networks:
+      - backend
+      - service_mesh
+    volumes:
+      - ./src/backend:/app/marketplace
+    ports:
+      - "8001:8000"
+    command:
+      bash -c "chmod 777 -R /app && pip install -r /app/marketplace/requirements.txt && python /app/marketplace/manage.py migrate && cd marketplace && python /app/marketplace/manage.py flush --noinput && mod_wsgi-express start-server --working-directory /app/marketplace --reload-on-changes /app/marketplace/marketplace/wsgi.py"
+    #command: bash -c "chmod 777 -R /app && pip install -r /app/marketplace/requirements.txt && mod_wsgi-express start-server --working-directory /app/marketplace --reload-on-changes /app/marketplace/marketplace/wsgi.py"
+  experience:
+    image: tp33/django
+    volumes:
+      - ./src/experience:/app/experience
+    networks:
+      - service_mesh
+      - public
+    ports:
+      - "8002:8000"
+    command: bash -c "chmod 777 -R /app && pip install -r /app/experience/requirements.txt && python /app/experience/manage.py migrate && cd experience && mod_wsgi-express start-server --working-directory /app/experience --reload-on-changes /app/experience/experience/wsgi.py"
+
+  kafka:
+    image: spotify/kafka
+    container_name: kafka
+    networks:
+      - batch_network
+      - service_mesh
+    environment:
+      ADVERTISED_HOST: kafka
+      ADVERTISED_PORT: 9092
+    hostname: kafka
+
+  es:
+    image: elasticsearch:7.4.0
+    container_name: es
+    environment:
+      - discovery.type=single-node
+    networks:
+      - service_mesh
+    ports:
+      - "9200:9200"
+  batch:
+    image: tp33/django
+    container_name: batch
+    volumes:
+      - ./src/batch/app:/app/
+    networks:
+      - batch_network
+      - service_mesh
+    restart: on-failure
+    command: bash -c "chmod +x /app/ && pip install elasticsearch -U && pip install kafka-python -U && curl -XDELETE es:9200/_all && python kafka_es_script.py"
+
+
+networks:
+  backend:
+    name: backend
+    external: true
+  service_mesh:
+    name: service_mesh
+  public:
+    name: public
+  batch_network:
+    name: batch_network
